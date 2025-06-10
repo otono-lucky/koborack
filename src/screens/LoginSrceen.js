@@ -12,16 +12,37 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import withThemeHeader from '../hoc/WithThemeHeader';
+import { useLoginMutation } from '../api/apiSlice';
 
 const LoginScreen = ({ navigation }) => {
   const { theme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  const [ Login, { isLoading } ] = useLoginMutation();
+
+  const handleLogin = async () => {
+    if (!email || !password){
+      Alert.alert("Please enter both your email and password")
+      return;
+    }
+
+    try {
+      const result = await Login({email, password}).unwrap();
+      console.log('Login successful', result)
+      Alert.alert(result.message || 'Login successful')
+      navigation.navigate('Dashboard', {id: result.data.id})
+    } catch (error) {
+      console.error('Login failed:', error)
+      Alert.alert('Login failed', error?.data?.message)
+    }
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
@@ -75,8 +96,8 @@ const LoginScreen = ({ navigation }) => {
               <Text style={[styles.forgotPasswordText, { color: theme.primary }]}>Forgot password?</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]}>
-              <Text style={styles.buttonText}>Log In</Text>
+            <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={() => handleLogin()}>
+              <Text style={styles.buttonText}>{!isLoading ? "Log In" : "loading..."}</Text>
             </TouchableOpacity>
 
             <View style={styles.footer}>
