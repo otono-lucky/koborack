@@ -12,10 +12,12 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import withThemeHeader from '../hoc/WithThemeHeader';
+import { useSignUpMutation } from '../api/apiSlice';
 
 const RegisterScreen = ({ navigation }) => {
   const { theme } = useTheme();
@@ -28,13 +30,17 @@ const RegisterScreen = ({ navigation }) => {
     confirmPassword: '',
   });
 
+  const [ signUp, {isLoading}] = useSignUpMutation();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showRequiredFieldMessage, setShowRequiredFieldMessage] = useState(false);
+  const [showPasswordMismatchMessage, setPasswordMismatchMessage] = useState(false);
 
   const handleChange = (name, value) => {
     setForm({ ...form, [name]: value });
   };
-
+  
   const iconMap = {
     firstname: 'user',
     lastname: 'user',
@@ -43,6 +49,40 @@ const RegisterScreen = ({ navigation }) => {
     password: 'lock',
     confirmPassword: 'lock',
   };
+  const handleSignUp = async (form) => {
+    try {
+      console.log('starting request...')
+      console.log('firstname: ', form.firstname)
+      console.log('lastname: ', form.lastname)
+      console.log('phone: ', form.phone)
+      console.log('email: ', form.email)
+      console.log('Password: ', form.password)
+      console.log('confirm password: ', form.confirmPassword)
+      if (!form.firstname || !form.lastname || !form.email || !form.password || !form.phone || !form.confirmPassword) {
+        setShowRequiredFieldMessage(true);
+        Alert.alert("All fields are required");
+        return; // stop execution if required fields are missing
+      }
+
+      if (form.confirmPassword !== form.password) {
+        setPasswordMismatchMessage(true)
+        Alert.alert("Confirm Password does not match Password");
+        return;
+      }
+
+      setPasswordMismatchMessage(false)
+      const newUser = {...form, phoneNumber: form.phone}
+      const result = await signUp(newUser).unwrap();
+      Alert.alert('Success', result.message)
+      console.log(result)
+      navigation.navigate('ConfirmEmail', {id: result.data.id})
+
+    } catch (err) {
+      console.log('Signup error', err)
+       Alert.alert('Registration failed', err?.data?.message);
+    }
+  }
+
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
@@ -88,12 +128,17 @@ const RegisterScreen = ({ navigation }) => {
                       <FontAwesome5 name={iconMap[field]} size={16} color={theme.placeholder} style={styles.inputIcon} />
                     )}
                   </View>
+                  {showRequiredFieldMessage && !form[field] ? 
+                  <Text style={{color: 'red'}}>{field === 'confirmPassword' ? 'Confirm Password' : field.charAt(0).toUpperCase() + field.slice(1)} is required</Text> 
+                  : showPasswordMismatchMessage && field === 'confirmPassword' ? 
+                  <Text style={{color: 'red'}}>Confirm password does not match password</Text> 
+                  : null}
                 </View>
               );
             })}
 
-            <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]}>
-              <Text style={styles.buttonText}>Sign Up</Text>
+            <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={() => handleSignUp(form)}>
+              <Text style={styles.buttonText}>{!isLoading ? "Sign Up" : "Loading..."}</Text>
             </TouchableOpacity>
 
             <View style={styles.footer}>

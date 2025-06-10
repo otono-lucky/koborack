@@ -12,14 +12,36 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import withThemeHeader from '../hoc/WithThemeHeader';
+import { useForgotPasswordMutation } from '../api/apiSlice';
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const { theme } = useTheme();
   const [email, setEmail] = useState('');
+
+  const [ ForgotPassword, {isLoading} ] = useForgotPasswordMutation();
+
+
+  const handleForgotPassword = async () => {
+     
+      if (!email) {
+        Alert.alert('Email is required, please provide your email');
+        return;
+      }
+  
+      try {
+        const result = await ForgotPassword({ email }).unwrap();
+        console.log('✅ Password Link sent:', result);
+        Alert.alert('Success', result.message || 'Password link sent, please check your email');
+      } catch (error) {
+        console.error('❌ Failed to send password link:', error);
+        Alert.alert('Password Link failed:', error?.data?.message || 'Failed to send password link:');
+      }
+    };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
@@ -48,7 +70,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
               </View>
             </View>
 
-            <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]}>
+            <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={() => handleForgotPassword()}>
               <Text style={styles.buttonText}>Send Reset Link</Text>
             </TouchableOpacity>
 
