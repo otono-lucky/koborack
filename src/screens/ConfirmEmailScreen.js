@@ -12,13 +12,60 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import withThemeHeader from '../hoc/WithThemeHeader';
+import { useConfirmEmailMutation, useResendVerificationEmailMutation } from '../api/apiSlice';
 
-const ConfirmEmailScreen = () => {
+const ConfirmEmailScreen = ({ navigation }) => {
   const { theme } = useTheme();
   const [code, setCode] = useState('');
+  const userId = navigation.getParam('id');
+
+  const [ ConfirmEmail, {isLoading} ] = useConfirmEmailMutation();
+  const [ ResendVerificationEmail, {isSuccess} ] = useResendVerificationEmailMutation();
+
+  const handleEmailConfirmation = async () => {
+    if (!code) {
+      Alert.alert('Missing OTP', 'Please input your OTP to continue.');
+      return;
+    }
+
+    if (!userId) {
+      Alert.alert('Invalid request', 'Please register before proceeding.');
+      return;
+    }
+
+    try {
+      const result = await ConfirmEmail({ userId, token: code }).unwrap();
+      console.log('✅ OTP verification success:', result);
+      Alert.alert('Success', result.message || 'OTP verification successful');
+      navigation.navigate('Dashboard', {id: userId})
+    } catch (error) {
+      console.error('❌ OTP verification error:', error);
+      Alert.alert('Verification failed', error?.data?.message || 'OTP verification failed');
+    }
+  };
+
+
+  const handleResendEmailConfirmation = async () => {
+   
+    if (!userId) {
+      Alert.alert('Invalid request', 'Please register before proceeding.');
+      return;
+    }
+
+    try {
+      const result = await ResendVerificationEmail({ userId }).unwrap();
+      console.log('✅ OTP verification sent:', result);
+      Alert.alert('Success', result.message || 'OTP sent, please check your email');
+    } catch (error) {
+      console.error('❌ OTP resend error:', error);
+      Alert.alert('OTP resend failed', error?.data?.message || 'Failed to resend verification email');
+    }
+  };
+
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
@@ -41,11 +88,13 @@ const ConfirmEmailScreen = () => {
               value={code}
               onChangeText={setCode}
             />
-            <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]}>
-            <Text style={styles.buttonText}>Confirm</Text>
+            <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]}
+              onPress={() => handleEmailConfirmation()}
+            >
+            <Text style={styles.buttonText}>{!isLoading ? "Confirm" : "Loading..."}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.resendLink}>
+            <TouchableOpacity style={styles.resendLink} onPress={() => handleResendEmailConfirmation()}>
               <Text style={[styles.resendText, { color: theme.primary }]}>Resend email</Text>
             </TouchableOpacity>
           </ScrollView>
