@@ -12,6 +12,8 @@ import { apiSlice } from './src/api/apiSlice';
 import { ApiProvider } from '@reduxjs/toolkit/query/react';
 import { Provider } from 'react-redux';
 import { store } from './src/api/store';
+import WalletScreen from './src/screens/WalletScreen';
+import SetGoalScreen from './src/screens/SetGoalScreen';
 
 const navigator = createStackNavigator(
   {
@@ -21,11 +23,13 @@ const navigator = createStackNavigator(
     ForgotPassword: ForgotPasswordScreen,
     ConfirmEmail: ConfirmEmailScreen,
     Dashboard: Dashboard,
+    Wallet: WalletScreen,
+    SetGoal: SetGoalScreen,
   },
   {
-    initialRouteName: 'Home',
+    initialRouteName: 'Dashboard',
     defaultNavigationOptions: {
-      headerShown: true,
+      headerShown: false,
     },
   }
 );
