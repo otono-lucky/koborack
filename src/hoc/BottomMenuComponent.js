@@ -36,7 +36,7 @@ const BottomMenuComponent = ({ toggleSaveModal, navigation }) => {
   const menuItems = [
     { icon: "home", label: "Home", color: theme.primary, screen: "Dashboard" },
     { icon: "wallet", label: "Wallet", color: theme.text, screen: "Wallet" },
-    { icon: "plus", label: "Save", color: "#fff", center: true },
+    { icon: "plus", label: "Save", color: "#fff", center: true, screen: "Save" },
     { icon: "chart-pie", label: "Stats", color: theme.text },
     { icon: "user", label: "Profile", color: theme.text },
   ];
@@ -51,7 +51,7 @@ const BottomMenuComponent = ({ toggleSaveModal, navigation }) => {
                 key={i}
                 style={[styles.centerIconWrapper, { backgroundColor: theme.primary, transform: [{ scale: pulseAnim }] }]}
               >
-                <TouchableOpacity onPress={() => toggleSaveModal?.()}>
+                <TouchableOpacity onPress={() => navigation.navigate(item.screen)}>
                   <FontAwesome5 name={item.icon} size={20} color={item.color} />
                 </TouchableOpacity>
               </Animated.View>

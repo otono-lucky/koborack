@@ -14,6 +14,7 @@ import { Provider } from 'react-redux';
 import { store } from './src/api/store';
 import WalletScreen from './src/screens/WalletScreen';
 import SetGoalScreen from './src/screens/SetGoalScreen';
+import SaveScreen from './src/screens/SaveScreen';
 
 const navigator = createStackNavigator(
   {
@@ -25,6 +26,7 @@ const navigator = createStackNavigator(
     Dashboard: Dashboard,
     Wallet: WalletScreen,
     SetGoal: SetGoalScreen,
+    Save: SaveScreen,
   },
   {
     initialRouteName: 'Dashboard',

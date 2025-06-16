@@ -5,17 +5,32 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Modal,
+  TextInput,
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Layout from "../hoc/Layout";
-import { withNavigation } from "react-navigation";
 
 const Dashboard = ({navigation}) => {
   const [chatModalVisible, setChatModalVisible] = useState(false);
   const [notificationsModalVisible, setNotificationsModalVisible] = useState(false);
+  const [saveModalVisible, setSaveModalVisible] = useState(false);
+  const [selectedAmount, setSelectedAmount] = useState('100');
+
+  // State and modal trigger
+const [addMoneyVisible, setAddMoneyVisible] = useState(false);
+const [selectedGoal, setSelectedGoal] = useState("");
+const [amountToAdd, setAmountToAdd] = useState("");
+
+// Function to open modal with specific goal
+const openAddMoneyModal = (goalName) => {
+  setSelectedGoal(goalName);
+  setAmountToAdd("");
+  setAddMoneyVisible(true);
+};
 
   return (
-    <Layout title="Dashboard">
+    <Layout title="Dashboard" navigation={navigation} onSavePress={() => setSaveModalVisible(true)}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Welcome Banner */}
         <View style={styles.banner}>
@@ -26,12 +41,12 @@ const Dashboard = ({navigation}) => {
         {/* Quick Actions */}
         <View style={styles.quickActions}>
           {[
-            { icon: "plus-circle", label: "Save Now", color: "#16a34a" },
+            { icon: "plus-circle", label: "Save Now", color: "#16a34a", screen: "Save" },
             { icon: "users", label: "Groups", color: "#2563eb" },
             { icon: "chart-line", label: "Invest", color: "#7c3aed" },
-            { icon: "wallet", label: "Wallet", color: "#ca8a04" },
+            { icon: "wallet", label: "Wallet", color: "#ca8a04", screen: "Wallet" },
           ].map((item, index) => (
-            <TouchableOpacity key={index} style={styles.actionItem}>
+            <TouchableOpacity key={index} style={styles.actionItem} onPress={() => navigation.navigate(item.screen)}>
               <FontAwesome5 name={item.icon} size={20} color={item.color} />
               <Text style={[styles.actionText, { color: item.color }]}>{item.label}</Text>
             </TouchableOpacity>
@@ -41,7 +56,7 @@ const Dashboard = ({navigation}) => {
         {/* Your Goals Section */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Your Goals</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("SetGoal")}><Text style={styles.sectionLink}>+ New Goal</Text></TouchableOpacity>
+          <TouchableOpacity><Text style={styles.sectionLink}>+ New Goal</Text></TouchableOpacity>
         </View>
         <View style={styles.cardList}>
           {[
@@ -66,9 +81,13 @@ const Dashboard = ({navigation}) => {
                   <View style={[styles.progressBarFill, { width: `${goal.progress}%`, backgroundColor: goal.color }]} />
                 </View>
               </View>
-              <TouchableOpacity style={{ marginTop: 10 }}>
-                <Text style={[styles.cardButton, { backgroundColor: goal.color, textAlign: 'center' }]}>Add Money</Text>
-              </TouchableOpacity>
+              <TouchableOpacity
+              style={{ marginTop: 10 }}
+              onPress={() => openAddMoneyModal(goal.title)}
+            >
+              <Text style={[styles.cardButton, { backgroundColor: goal.color, textAlign: 'center' }]}>Add Money</Text>
+            </TouchableOpacity>
+
             </View>
           ))}
         </View>
@@ -123,6 +142,74 @@ const Dashboard = ({navigation}) => {
           </View>
         </View>
       </ScrollView>
+
+      <Modal visible={addMoneyVisible} animationType="slide" transparent>
+      <View style={{
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <View style={{
+          width: '90%',
+          backgroundColor: '#fff',
+          borderRadius: 16,
+          padding: 20
+        }}>
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: 20
+          }}>
+            <Text style={{ fontWeight: 'bold', fontSize: 18 }}>Add Money</Text>
+            <TouchableOpacity onPress={() => setAddMoneyVisible(false)}>
+              <FontAwesome5 name="times" size={20} />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={{ fontWeight: '500', marginBottom: 6 }}>Goal</Text>
+          <View style={{
+            padding: 12,
+            backgroundColor: '#f3f4f6',
+            borderRadius: 10,
+            marginBottom: 12
+          }}>
+            <Text>{selectedGoal}</Text>
+          </View>
+
+          <Text style={{ fontWeight: '500', marginBottom: 6 }}>Amount</Text>
+          <TextInput
+            placeholder="Enter amount"
+            keyboardType="numeric"
+            value={amountToAdd}
+            onChangeText={setAmountToAdd}
+            style={{
+              borderWidth: 1,
+              borderColor: '#e5e7eb',
+              borderRadius: 10,
+              padding: 12,
+              marginBottom: 16
+            }}
+          />
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#16a34a',
+              paddingVertical: 12,
+              borderRadius: 10,
+              alignItems: 'center'
+            }}
+            onPress={() => {
+              console.log(`Add ₦${amountToAdd} to ${selectedGoal}`);
+              setAddMoneyVisible(false);
+            }}
+          >
+            <Text style={{ color: '#fff', fontWeight: 'bold' }}>Add Money</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+
     </Layout>
   );
 };
@@ -238,6 +325,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
-
-export default withNavigation(Dashboard);
+export default Dashboard;
