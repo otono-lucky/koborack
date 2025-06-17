@@ -17,7 +17,7 @@ import {
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import withThemeHeader from '../hoc/WithThemeHeader';
-import { useLoginMutation } from '../api/apiSlice';
+import { useLoginMutation } from '../api/authApi';
 
 const LoginScreen = ({ navigation }) => {
   const { theme } = useTheme();
@@ -25,7 +25,7 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const [ Login, { isLoading } ] = useLoginMutation();
+  const [ login, { isLoading } ] = useLoginMutation();
 
   const handleLogin = async () => {
     if (!email || !password){
@@ -34,7 +34,7 @@ const LoginScreen = ({ navigation }) => {
     }
 
     try {
-      const result = await Login({email, password}).unwrap();
+      const result = await login({email, password}).unwrap();
       console.log('Login successful', result)
       Alert.alert(result.message || 'Login successful')
       navigation.navigate('Dashboard', {id: result.data.id})

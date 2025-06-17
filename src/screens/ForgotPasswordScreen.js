@@ -17,13 +17,13 @@ import {
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import withThemeHeader from '../hoc/WithThemeHeader';
-import { useForgotPasswordMutation } from '../api/apiSlice';
+import { useForgotPasswordMutation } from '../api/authApi';
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const { theme } = useTheme();
   const [email, setEmail] = useState('');
 
-  const [ ForgotPassword, {isLoading} ] = useForgotPasswordMutation();
+  const [ forgotPassword, {isLoading} ] = useForgotPasswordMutation();
 
 
   const handleForgotPassword = async () => {
@@ -34,7 +34,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
       }
   
       try {
-        const result = await ForgotPassword({ email }).unwrap();
+        const result = await forgotPassword({ email }).unwrap();
         console.log('✅ Password Link sent:', result);
         Alert.alert('Success', result.message || 'Password link sent, please check your email');
       } catch (error) {

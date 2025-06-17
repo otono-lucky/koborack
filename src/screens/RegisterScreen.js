@@ -17,7 +17,7 @@ import {
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import withThemeHeader from '../hoc/WithThemeHeader';
-import { useSignUpMutation } from '../api/apiSlice';
+import { useSignUpMutation } from '../api/authApi';
 
 const RegisterScreen = ({ navigation }) => {
   const { theme } = useTheme();
@@ -49,15 +49,11 @@ const RegisterScreen = ({ navigation }) => {
     password: 'lock',
     confirmPassword: 'lock',
   };
+
   const handleSignUp = async (form) => {
     try {
       console.log('starting request...')
-      console.log('firstname: ', form.firstname)
-      console.log('lastname: ', form.lastname)
-      console.log('phone: ', form.phone)
-      console.log('email: ', form.email)
-      console.log('Password: ', form.password)
-      console.log('confirm password: ', form.confirmPassword)
+      
       if (!form.firstname || !form.lastname || !form.email || !form.password || !form.phone || !form.confirmPassword) {
         setShowRequiredFieldMessage(true);
         Alert.alert("All fields are required");
