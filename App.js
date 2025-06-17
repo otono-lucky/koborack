@@ -10,6 +10,9 @@ import ConfirmEmailScreen from "./src/screens/ConfirmEmailScreen";
 import Dashboard from "./src/screens/Dashboard";
 import { Provider } from "react-redux";
 import { store } from "./src/api/store";
+import WalletScreen from './src/screens/WalletScreen';
+import SetGoalScreen from './src/screens/SetGoalScreen';
+import SaveScreen from './src/screens/SaveScreen';
 
 const navigator = createStackNavigator(
   {
@@ -19,11 +22,14 @@ const navigator = createStackNavigator(
     ForgotPassword: ForgotPasswordScreen,
     ConfirmEmail: ConfirmEmailScreen,
     Dashboard: Dashboard,
+    Wallet: WalletScreen,
+    SetGoal: SetGoalScreen,
+    Save: SaveScreen,
   },
   {
-    initialRouteName: "Home",
+    initialRouteName: 'Dashboard',
     defaultNavigationOptions: {
-      headerShown: true,
+      headerShown: false,
     },
   }
 );
