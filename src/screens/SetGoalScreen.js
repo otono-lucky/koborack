@@ -10,9 +10,11 @@ import {
   ScrollView,
   Keyboard,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 import Layout from "../hoc/Layout";
 import { useTheme } from "../../context/ThemeContext";
+import { useSetGoalMutation } from "../api/goalSavings";
 
 const SetGoalScreen = () => {
   const { theme } = useTheme();
@@ -27,9 +29,44 @@ const SetGoalScreen = () => {
     AutoSave: "",
   });
 
+  const [ setGoal ] = useSetGoalMutation();
+
   const handleChange = (key, value) => {
     setForm({ ...form, [key]: value });
   };
+
+  const handleSetGoal = () => {
+    if(!form.TargetAmount || 
+      !form.TargetAmount || 
+      !form.AmountToAdd || 
+      !form.FundFrequency || 
+      !form.EndDate ||
+      !form.WithdrawalDate ||
+      !form.NextRuntime) {
+        Alert.alert("Please fill all fields");
+        return;
+      }
+
+      try {
+        const result = setGoal(form).unwrap();
+        console.log('Set Goal successful', result)
+        Alert.alert(result.message || 'Goal successfully set' )
+        setForm({...form,
+            TargetName: "",
+            TargetAmount: "",
+            AmountToAdd: "",
+            FundFrequency: "",
+            EndDate: "",
+            WithdrawalDate: "",
+            NextRuntime: "",
+            AutoSave: "",
+          });
+        // navigation.navigate('Dashboard', {id: result.data.id})        
+      } catch (error) {        
+        console.error('Set goal failed', error)
+        Alert.alert('Failed to set goal', error?.data?.message)
+      }
+  }
 
   return (
     <Layout>
@@ -64,7 +101,7 @@ const SetGoalScreen = () => {
               </View>
             ))}
 
-            <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]}>
+            <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={() => handleSetGoal()}>
               <Text style={styles.buttonText}>Save Goal</Text>
             </TouchableOpacity>
           </ScrollView>

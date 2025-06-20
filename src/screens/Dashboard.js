@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,13 +10,15 @@ import {
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Layout from "../hoc/Layout";
+import { useGetUserQuery } from "../api/userApi";
+import { validateSession } from "../utils/sessionUtils";
 
-const Dashboard = ({navigation}) => {
+const Dashboard = ({ navigation, route }) => {
   const [chatModalVisible, setChatModalVisible] = useState(false);
   const [notificationsModalVisible, setNotificationsModalVisible] = useState(false);
   const [saveModalVisible, setSaveModalVisible] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState('100');
-
+  
   // State and modal trigger
 const [addMoneyVisible, setAddMoneyVisible] = useState(false);
 const [selectedGoal, setSelectedGoal] = useState("");
@@ -28,13 +30,36 @@ const openAddMoneyModal = (goalName) => {
   setAmountToAdd("");
   setAddMoneyVisible(true);
 };
+ // Correct way to get params from route:
+  const initialUserId = route?.params?.id;
+  const [userId, setUserId] = useState(initialUserId);
+
+  console.log('User ID from navigation:', initialUserId);
+
+  // Query user data:
+  const { data: userData, isLoading: userLoading } = useGetUserQuery(userId, {
+    skip: !userId, // Skip fetch if no userId yet
+  });
+
+
+useEffect(() => {
+  const checkSession = async () => {
+  await validateSession(() => navigation.navigate('Login'))
+    .then(session => {
+      if (session) {
+        setUserId(session.userId);
+      }
+    });
+  }
+  checkSession();
+}, []);
 
   return (
     <Layout title="Dashboard" navigation={navigation} onSavePress={() => setSaveModalVisible(true)}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Welcome Banner */}
         <View style={styles.banner}>
-          <Text style={styles.bannerTitle}>Hello, Adeola!</Text>
+          <Text style={styles.bannerTitle}>Hello, {userData?.firstName || "User"}!</Text>
           <Text style={styles.bannerSubtitle}>You've saved ₦12,450 this month! 🎉</Text>
         </View>
 

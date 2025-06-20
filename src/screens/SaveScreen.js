@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import Layout from "../hoc/Layout";
 
@@ -12,6 +12,20 @@ const SaveScreen = () => {
     { label: "Electricity", value: "Electricity" },
     { label: "Rent Fund", value: "Rent Fund" },
   ];
+
+  const handleSaveGoal = () => {
+    if (!selectedAmount) {
+      Alert.alert('Please enter goal amount')
+      return;
+    }
+
+    try {
+      
+    } catch (error) {
+      console.error('Failed to fund goal', error)
+      Alert.alert(error?.data?.message || 'Failed to fund goal')
+    }
+  }
 
   return (
     <Layout title="Save">

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,9 +9,14 @@ import {
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 import Layout from "../hoc/Layout";
+import { useFundWalletMutation, useGetBalanceQuery, useGetWalletQuery } from "../api/walletApi";
+import { validateSession } from "../utils/sessionUtils";
+import { formatCurrency } from "../utils/format";
 
-const WalletScreen = () => {
-  const { theme } = useTheme();
+const WalletScreen = ({navigation}) => {
+  const { theme } = useTheme();  
+  const initialUserId = navigation.getParam('id');
+  const [userId, setUserId] = useState(initialUserId);
 
   const recentTransactions = [
     { id: 1, type: "Deposit", amount: "+₦5,000", icon: "arrow-down", color: "#22c55e" },
@@ -19,13 +24,36 @@ const WalletScreen = () => {
     { id: 3, type: "Transfer", amount: "-₦1,000", icon: "exchange-alt", color: "#3b82f6" },
   ];
 
+
+  const { data: wallet, isLoading, isError } = useGetWalletQuery(userId, {
+    refetchOnMountOrArgChange: true,
+    skip: !userId,
+  });
+
+  console.log('wallet information', wallet)
+
+  const [ fundWallet ] = useFundWalletMutation(); 
+  
+  useEffect(() => {
+    const checkSession = async () => {
+    await validateSession(() => navigation.navigate('Login'))
+      .then(session => {
+        if (session) {
+          setUserId(session.userId);
+        }
+      });
+    }
+    checkSession();
+  }, []);
+  
+
   return (
     <Layout title="Wallet">
       <ScrollView contentContainerStyle={styles.content}>
         {/* Wallet Balance */}
         <View style={[styles.walletCard, { backgroundColor: theme.card }]}>
           <Text style={[styles.walletLabel, { color: theme.text }]}>Current Balance</Text>
-          <Text style={[styles.walletAmount, { color: theme.primary }]}>₦25,450</Text>
+          <Text style={[styles.walletAmount, { color: theme.primary }]}>{formatCurrency(wallet?.result?.balance)}</Text>
           <View style={styles.walletActions}>
             <TouchableOpacity style={[styles.walletBtn, { backgroundColor: theme.primary }]}>
               <FontAwesome5 name="plus" size={14} color="#fff" />
