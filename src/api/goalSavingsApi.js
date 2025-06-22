@@ -13,6 +13,7 @@ export const goalSavingApi = createApi({
         //     return headers;
         // }
     }),
+    tagTypes: ["Goals"],
     endpoints: (builder) => ({
         setGoal: builder.mutation({
             query: (formData) => ({
@@ -20,20 +21,35 @@ export const goalSavingApi = createApi({
                 method: 'POST',
                 body: formData
             }),
-            invalidatesTags: ["Goals"],
+            invalidatesTags: [{type: "Goals"}],
         }),
         getGoals: builder.query({
             query: (userId) => ({
                 url: `/listAllGoals/${userId}`,
                 method: 'GET',
             }),
-            providesTags: ["Goals"],
+            providesTags: [{type: "Goals"}],
         }),
         getGoal: builder.query({
             query: (SavingsId) => ({
                 url: `/getPersonalSavings/${SavingsId}`,
                 method: 'GET',
             })
+        }),
+        updateGoal: builder.mutation({
+            query: (formData, goalId) => ({
+                url: `/${goalId}`,
+                method: 'PUT',
+                body: formData
+            }),
+            invalidatesTags: [{type: "Goals"}],
+        }),
+        delteGoal: builder.mutation({
+            query: (goalId) => ({
+                url: `/${goalId}`,
+                method: 'DELETE'
+            }),
+            invalidatesTags: [{type: "Goals"}],
         }),
         getTotalGoalAmount: builder.query({
             query: (userId) => ({
@@ -54,6 +70,8 @@ export const {
     useSetGoalMutation,
     useGetGoalsQuery,
     useGetGoalQuery,
+    useUpdateGoalMutation,
+    useDelteGoalMutation,
     useGetTotalGoalAmountQuery,
     useGetGoalFundCountQuery
 } = goalSavingApi
