@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,8 @@ import {
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import withThemeHeader from '../hoc/WithThemeHeader';
-import { useLoginMutation } from '../api/apiSlice';
+import { useLoginMutation } from '../api/authApi';
+import { decodeToken, saveToken } from '../utils/token';
 
 const LoginScreen = ({ navigation }) => {
   const { theme } = useTheme();
@@ -25,7 +26,7 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const [ Login, { isLoading } ] = useLoginMutation();
+  const [ login, { isLoading } ] = useLoginMutation();
 
   const handleLogin = async () => {
     if (!email || !password){
@@ -34,10 +35,35 @@ const LoginScreen = ({ navigation }) => {
     }
 
     try {
-      const result = await Login({email, password}).unwrap();
+      const result = await login({email, password}).unwrap();
+      
+      const token = result.data
+      
+      if (!token) {
+        Alert.alert('Login failed', 'No token received. Please check your credentials.');
+        return;
+      }
+      
+      await saveToken(token);
+      console.log('Token saved successfully', token);
+
+      const userInfo = decodeToken(token);
+      
+      if (!userInfo) {
+        Alert.alert('Login failed', 'Invalid user information received.');
+      }
+      const userId = userInfo["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"]
+      
+      if (!userId) {
+        Alert.alert('Login failed', 'User ID not found in token.');
+      }
+
       console.log('Login successful', result)
-      Alert.alert(result.message || 'Login successful')
-      navigation.navigate('Dashboard', {id: result.data.id})
+      console.log('User ID', userId)
+      Alert.alert('succeeded', result.message || 'Login successful')
+    
+      navigation.navigate('Dashboard', { id: userId });
+
     } catch (error) {
       console.error('Login failed:', error)
       Alert.alert('Login failed', error?.data?.message)

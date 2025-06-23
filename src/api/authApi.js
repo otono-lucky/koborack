@@ -1,40 +1,40 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-export const apiSlice = createApi({
-    reducerPath: 'api',
-    baseQuery: fetchBaseQuery({ baseUrl: 'https://2b33-102-90-82-83.ngrok-free.app/api' }),
+export const authApi = createApi({
+    reducerPath: 'authApi',
+    baseQuery: fetchBaseQuery({ baseUrl: 'https://sincere-reasonably-mouse.ngrok-free.app/api/Authentication' }),
     endpoints: (builder) => ({
         signUp: builder.mutation({
             query: (user) => ({
-                url: '/Authentication/Register',
+                url: '/Register',
                 method: 'POST',
                 body: user
             })
         }),
-        Login: builder.mutation({
+        login: builder.mutation({
             query: (data) => ({
-                url: '/Authentication/Login',
+                url: '/Login',
                 method: 'POST',
                 body: data
             })
         }),
-        ConfirmEmail: builder.mutation({
+        confirmEmail: builder.mutation({
             query: (data) => ({
-                url: '/Authentication/ConfirmEmail',
+                url: '/ConfirmEmail',
                 method: 'POST',
                 body: data
             })
         }),
-        ResendVerificationEmail: builder.mutation({
+        resendVerificationEmail: builder.mutation({
             query: (data) => ({
-                url: '/Authentication/resend-verification-email',
+                url: '/resend-verification-email',
                 method: 'POST',
                 body: data
             })
         }),
-        ForgotPassword: builder.mutation({
+        forgotPassword: builder.mutation({
             query: (data) => ({
-                url: '/Authentication/forgot-password',
+                url: '/forgot-password',
                 method: 'POST',
                 body: data
             })
@@ -48,4 +48,4 @@ export const {
     useConfirmEmailMutation,
     useResendVerificationEmailMutation,
     useForgotPasswordMutation,
-} = apiSlice
+} = authApi

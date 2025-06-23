@@ -16,15 +16,15 @@ import {
 } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import withThemeHeader from '../hoc/WithThemeHeader';
-import { useConfirmEmailMutation, useResendVerificationEmailMutation } from '../api/apiSlice';
+import { useConfirmEmailMutation, useResendVerificationEmailMutation } from '../api/authApi';
 
 const ConfirmEmailScreen = ({ navigation }) => {
   const { theme } = useTheme();
   const [code, setCode] = useState('');
   const userId = navigation.getParam('id');
 
-  const [ ConfirmEmail, {isLoading} ] = useConfirmEmailMutation();
-  const [ ResendVerificationEmail, {isSuccess} ] = useResendVerificationEmailMutation();
+  const [ confirmEmail, {isLoading} ] = useConfirmEmailMutation();
+  const [ resendVerificationEmail, {isSuccess} ] = useResendVerificationEmailMutation();
 
   const handleEmailConfirmation = async () => {
     if (!code) {
@@ -38,7 +38,7 @@ const ConfirmEmailScreen = ({ navigation }) => {
     }
 
     try {
-      const result = await ConfirmEmail({ userId, token: code }).unwrap();
+      const result = await confirmEmail({ userId, token: code }).unwrap();
       console.log('✅ OTP verification success:', result);
       Alert.alert('Success', result.message || 'OTP verification successful');
       navigation.navigate('Dashboard', {id: userId})
@@ -57,7 +57,7 @@ const ConfirmEmailScreen = ({ navigation }) => {
     }
 
     try {
-      const result = await ResendVerificationEmail({ userId }).unwrap();
+      const result = await resendVerificationEmail({ userId }).unwrap();
       console.log('✅ OTP verification sent:', result);
       Alert.alert('Success', result.message || 'OTP sent, please check your email');
     } catch (error) {

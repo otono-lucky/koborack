@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,13 +10,19 @@ import {
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Layout from "../hoc/Layout";
+import { useGetUserQuery } from "../api/userApi";
+import { validateSession } from "../utils/sessionUtils";
+import { useGetGoalsQuery, useGetTotalGoalAmountQuery } from "../api/goalSavingsApi";
+import { useGetActiveGroupsQuery } from "../api/groupSavingApi";
+import { formatCurrency } from "../utils/format";
+import { removeToken } from "../utils/token";
 
-const Dashboard = ({navigation}) => {
+const Dashboard = ({ navigation }) => {
   const [chatModalVisible, setChatModalVisible] = useState(false);
   const [notificationsModalVisible, setNotificationsModalVisible] = useState(false);
   const [saveModalVisible, setSaveModalVisible] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState('100');
-
+  
   // State and modal trigger
 const [addMoneyVisible, setAddMoneyVisible] = useState(false);
 const [selectedGoal, setSelectedGoal] = useState("");
@@ -29,13 +35,57 @@ const openAddMoneyModal = (goalName) => {
   setAddMoneyVisible(true);
 };
 
+  const initialUserId = navigation.getParam('id');
+  const [userId, setUserId] = useState(initialUserId);
+  
+  console.log('User ID from navigation:', initialUserId);
+
+  // Query for user data
+  const { data: user, isLoading: userLoading } = useGetUserQuery(userId, {
+    skip: !userId, 
+  });
+  console.log("User Details",user)
+  
+  // Query for user goals
+  const { data: userGoals, isLoading: goalsLoading, isError: goalsError} = useGetGoalsQuery(userId, {
+    skip: !userId, 
+  });
+  const goals = userGoals?.result || [];
+  console.log("User Goals:", userGoals)
+
+  // Query for active groups
+  const { data: groups, isLoading: activeGroupsLoading, isError: activeGroupsError, error } = useGetActiveGroupsQuery();
+  const activeGroups = groups?.result || [];  
+  console.log('Active Groups:', groups);
+
+  // Query for user total goal amount saved
+  const { data: totalGoalAmountSaved } = useGetTotalGoalAmountQuery(userId, {
+    skip: !userId,
+  });
+  const totalAmountSaved = totalGoalAmountSaved?.result || 0;
+  console.log('TotalAmountSaved',totalGoalAmountSaved)
+
+  useEffect(() => {
+    // removeToken();
+  const checkSession = async () => {
+  await validateSession(() => navigation.navigate('Login'))
+    .then(session => {
+      if (session) {
+        setUserId(session.userId);
+        console.log("Session validated, user ID:", session.userId);
+      }
+    });
+  }
+  checkSession();
+}, []);
+
   return (
     <Layout title="Dashboard" navigation={navigation} onSavePress={() => setSaveModalVisible(true)}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Welcome Banner */}
         <View style={styles.banner}>
-          <Text style={styles.bannerTitle}>Hello, Adeola!</Text>
-          <Text style={styles.bannerSubtitle}>You've saved ₦12,450 this month! 🎉</Text>
+          <Text style={styles.bannerTitle}>Hello, {user?.firstName || "User"}</Text>
+          <Text style={styles.bannerSubtitle}>You've saved {formatCurrency(totalAmountSaved)} this month! 🎉</Text>
         </View>
 
         {/* Quick Actions */}
@@ -56,36 +106,41 @@ const openAddMoneyModal = (goalName) => {
         {/* Your Goals Section */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Your Goals</Text>
-          <TouchableOpacity><Text style={styles.sectionLink}>+ New Goal</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('SetGoal')}><Text style={styles.sectionLink}>+ New Goal</Text></TouchableOpacity>
         </View>
         <View style={styles.cardList}>
-          {[
-            { title: "Rice Fund", desc: "Daily savings for 25kg rice", icon: "utensils", saved: "₦8,250", target: "₦15,000", progress: 55, color: "#16a34a" },
-            { title: "Electricity", desc: "Monthly electricity bill", icon: "bolt", saved: "₦3,200", target: "₦5,000", progress: 64, color: "#2563eb" },
-            { title: "Rent Fund", desc: "Yearly rent savings", icon: "home", saved: "₦45,000", target: "₦300,000", progress: 15, color: "#7c3aed" },
-          ].map((goal, i) => (
-            <View key={i} style={styles.card}>
+          {
+          // [
+          //   { title: "Rice Fund", desc: "Daily savings for 25kg rice", icon: "utensils", saved: "₦8,250", target: "₦15,000", progress: 55, color: "#16a34a" },
+          //   { title: "Electricity", desc: "Monthly electricity bill", icon: "bolt", saved: "₦3,200", target: "₦5,000", progress: 64, color: "#2563eb" },
+          //   { title: "Rent Fund", desc: "Yearly rent savings", icon: "home", saved: "₦45,000", target: "₦300,000", progress: 15, color: "#7c3aed" },
+          // ]
+          goalsError ? <Text style={{ textAlign: 'center', marginVertical: 40 }}>An error occured, please try again later!</Text>
+          : goals?.length === 0 ? 
+            <Text style={{ textAlign: 'center', marginVertical: 40 }}>No goals set yet. Start saving today!</Text>
+          :  goals?.map((goal) => (
+            <View key={goal.id} style={styles.card}>
               <View style={styles.cardHeader}>
                 <View>
-                  <Text style={styles.cardTitle}>{goal.title}</Text>
-                  <Text style={styles.cardDesc}>{goal.desc}</Text>
+                  <Text style={styles.cardTitle}>{goal.targetName}</Text>
+                  <Text style={styles.cardDesc}>{goal.description || "Saving for the future"} </Text>
                 </View>
-                <FontAwesome5 name={goal.icon} size={20} color={goal.color} />
+                <FontAwesome5 name={"home"} size={20} color={"#16a34a"} />
               </View>
               <View>
                 <View style={styles.cardStats}>
-                  <Text style={styles.cardText}>{goal.saved}</Text>
-                  <Text style={styles.cardText}>{goal.target}</Text>
+                  <Text style={styles.cardText}>{formatCurrency(goal.amountSaved)}</Text>
+                  <Text style={styles.cardText}>{formatCurrency(goal.targetAmount)}</Text>
                 </View>
                 <View style={styles.progressBarBase}>
-                  <View style={[styles.progressBarFill, { width: `${goal.progress}%`, backgroundColor: goal.color }]} />
+                  <View style={[styles.progressBarFill, { width: `${(goal.amountSaved / goal.targetAmount) * 100}%`, backgroundColor: "#16a34a" }]} />
                 </View>
               </View>
               <TouchableOpacity
               style={{ marginTop: 10 }}
-              onPress={() => openAddMoneyModal(goal.title)}
+              onPress={() => openAddMoneyModal(goal.targetName)}
             >
-              <Text style={[styles.cardButton, { backgroundColor: goal.color, textAlign: 'center' }]}>Add Money</Text>
+              <Text style={[styles.cardButton, { backgroundColor: "#16a34a", textAlign: 'center' }]}>Add Money</Text>
             </TouchableOpacity>
 
             </View>
@@ -98,7 +153,8 @@ const openAddMoneyModal = (goalName) => {
           <TouchableOpacity><Text style={styles.sectionLink}>View All</Text></TouchableOpacity>
         </View>
         <View style={styles.cardList}>
-          {[
+          {
+          [
             { title: "Farm Collective", desc: "Invest in rice farming", icon: "seedling", roi: "12% ROI", risk: "Low Risk", color: "#facc15" },
             { title: "Transport Pool", desc: "Logistics investment", icon: "truck", roi: "18% ROI", risk: "Medium Risk", color: "#2563eb" },
           ].map((inv, i) => (
@@ -122,25 +178,34 @@ const openAddMoneyModal = (goalName) => {
           <Text style={styles.sectionTitle}>Savings Groups</Text>
           <TouchableOpacity><Text style={styles.sectionLink}>Create Group</Text></TouchableOpacity>
         </View>
-        <View style={styles.cardList}>
+        
+       { 
+         activeGroupsError ? <Text style={{ textAlign: 'center', marginVertical: 40 }}>An error occured, please try again later!</Text>
+       :   activeGroups.length === 0 ? 
+        <Text style={{ textAlign: 'center', marginTop: 40 }}>No groups available. Start by creating a group!</Text>
+      : activeGroups.map(group => {
+        const progress = group.amountSaved ? (group.amountSaved / group.contributionAmount) * 100 : 0;
+
+      return (<View key={group.id} style={styles.cardList}>
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <FontAwesome5 name="users" size={20} color="#16a34a" />
-              <Text style={styles.cardTitle}>Family Rice Fund</Text>
+              <Text style={styles.cardTitle}>{group.saveName}</Text>
             </View>
-            <Text style={styles.cardDesc}>Group target: ₦60,000</Text>
+            <Text style={styles.cardDesc}>Group target: {formatCurrency(group.contributionAmount)}</Text>
             <View style={styles.cardStats}>
-              <Text style={styles.cardText}>₦32,400 saved</Text>
-              <Text style={styles.cardText}>54% complete</Text>
+              <Text style={styles.cardText}>{formatCurrency(group.amountSaved || 0)} saved</Text>
+              <Text style={styles.cardText}>{progress}% complete</Text>
             </View>
             <View style={styles.progressBarBase}>
-              <View style={[styles.progressBarFill, { width: '54%', backgroundColor: '#16a34a' }]} />
+              <View style={[styles.progressBarFill, { width: `${progress}%`, backgroundColor: '#16a34a' }]} />
             </View>
             <TouchableOpacity style={{ marginTop: 10 }}>
               <Text style={[styles.cardButton, { backgroundColor: '#16a34a', textAlign: 'center' }]}>Contribute Now</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </View>)}
+      )}
       </ScrollView>
 
       <Modal visible={addMoneyVisible} animationType="slide" transparent>
