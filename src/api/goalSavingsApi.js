@@ -4,7 +4,7 @@ import { getToken } from "../utils/token";
 export const goalSavingApi = createApi({
     reducerPath: 'savingApi',
     baseQuery: fetchBaseQuery({ 
-        baseUrl: 'https://sincere-reasonably-mouse.ngrok-free.app/api/Savings', 
+        baseUrl: 'https://koborack.onrender.com/api/Savings', 
         // prepareHeaders:  (headers) => () => {
         //     const token = getToken();
         //     if (token) {

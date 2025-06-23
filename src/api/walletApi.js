@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const walletApi = createApi({
     reducerPath: 'walleApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'https://sincere-reasonably-mouse.ngrok-free.app/api/Wallet' }),
+    baseQuery: fetchBaseQuery({ baseUrl: 'https://koborack.onrender.com/api/Wallet' }),
     endpoints: (builder) => ({
         fundWallet: builder.mutation({
             query: (data) => ({
