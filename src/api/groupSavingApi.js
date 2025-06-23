@@ -4,7 +4,7 @@ import { getToken } from "../utils/token";
 export const groupSavingApi = createApi({
     reducerPath: 'groupSavingApi',
     baseQuery: fetchBaseQuery({ 
-        baseUrl: 'https://sincere-reasonably-mouse.ngrok-free.app/api/GroupSavings', 
+        baseUrl: 'https://koborack.onrender.com/api/GroupSavings', 
         // prepareHeaders:  (headers) => () => {
         //     const token = getToken();
         //     if (token) {

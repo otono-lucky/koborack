@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const userApi = createApi({
     reducerPath: 'userApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'https://sincere-reasonably-mouse.ngrok-free.app/api/User' }),
+    baseQuery: fetchBaseQuery({ baseUrl: 'https://koborack.onrender.com/api/User' }),
     endpoints: (builder) => ({
         updateUser: builder.mutation({
             query: (data) => ({

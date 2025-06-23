@@ -40,8 +40,8 @@ const ConfirmEmailScreen = ({ navigation }) => {
     try {
       const result = await confirmEmail({ userId, token: code }).unwrap();
       console.log('✅ OTP verification success:', result);
-      Alert.alert('Success', result.message || 'OTP verification successful');
-      navigation.navigate('Dashboard', {id: userId})
+      Alert.alert('Success', result.message || 'OTP verification successful. You can now log in to your account.');
+      navigation.navigate('Login')
     } catch (error) {
       console.error('❌ OTP verification error:', error);
       Alert.alert('Verification failed', error?.data?.message || 'OTP verification failed');
