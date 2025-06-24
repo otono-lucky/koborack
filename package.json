@@ -9,7 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@react-native-community/datetimepicker": "^8.4.1",
+    "@react-native-community/datetimepicker": "^8.4.2",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-navigation/native": "^7.1.10",
     "@reduxjs/toolkit": "^2.8.2",
@@ -20,7 +20,9 @@
     "prop-types": "^15.8.1",
     "react": "19.0.0",
     "react-native": "0.79.2",
+    "react-native-dropdown-picker": "^5.4.6",
     "react-native-gesture-handler": "^2.25.0",
+    "react-native-paper": "^5.14.5",
     "react-native-picker-select": "^9.3.1",
     "react-native-reanimated": "^3.18.0",
     "react-native-safe-area-context": "^5.4.1",

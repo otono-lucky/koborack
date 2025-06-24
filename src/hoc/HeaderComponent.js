@@ -13,7 +13,7 @@ const HeaderComponent = () => {
           <View style={styles.logoCircle}>
             <FontAwesome5 name="piggy-bank" size={20} color="#16a34a" />
           </View>
-          <Text style={styles.title}>KoboStack</Text>
+          <Text style={styles.title}>Koborack</Text>
         </View>
 
         <View style={styles.right}>

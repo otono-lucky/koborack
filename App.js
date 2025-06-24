@@ -27,7 +27,7 @@ const navigator = createStackNavigator(
     Save: SaveScreen,
   },
   {
-    initialRouteName: 'Dashboard',
+    initialRouteName: 'Home',
     defaultNavigationOptions: {
       headerShown: false,
     },
