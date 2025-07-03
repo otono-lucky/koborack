@@ -11,12 +11,14 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   Modal,
+  Alert,
 } from "react-native";
 import Layout from "../hoc/Layout";
 import { useTheme } from "../../context/ThemeContext";
 import { ActivityIndicator, Switch, Button } from "react-native-paper";
+import { useSetGoalMutation } from "../api/goalSavingsApi";
 
-const SetGoalScreen = () => {
+const SetGoalScreen = ({ navigation }) => {
   const { theme } = useTheme();
 
   const [form, setForm] = useState({
@@ -30,7 +32,9 @@ const SetGoalScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [estimatedDuration, setEstimatedDuration] = useState(null);
   const [durationUnit, setDurationUnit] = useState("day");
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
+
+  const [ setGoal, { isLoading } ] = useSetGoalMutation();
 
   const fundFrequencyOptions = ["Daily", "Weekly", "Monthly"];
 
@@ -39,11 +43,15 @@ const SetGoalScreen = () => {
   };
 
   const handleCalculate = () => {
-    const { TargetAmount, AmountToAdd, FundFrequency } = form;
+    const { TargetAmount, AmountToAdd, FundFrequency, TargetName } = form;
     const target = parseFloat(TargetAmount);
     const amount = parseFloat(AmountToAdd);
 
-    if (!target || !amount || !FundFrequency) return;
+    if (!target || !amount || !FundFrequency || !TargetName ) 
+      return Alert.alert("Please fill all fields");
+
+    if (target < amount) 
+      return Alert.alert("Target amount cannot be less than amount to add");
 
     const periods = Math.ceil(target / amount);
     let unit = "day";
@@ -55,14 +63,53 @@ const SetGoalScreen = () => {
     setModalVisible(true);
   };
 
-  const handleSubmit = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setModalVisible(false);
-      alert("Goal saved successfully!");
-    }, 2000);
-  };
+  // const handleSubmit = () => {
+  //   setIsLoading(true);
+  //   setTimeout(() => {
+  //     setIsLoading(false);
+  //     setModalVisible(false);
+  //     alert("Goal saved successfully!");
+  //   }, 2000);
+  // };
+
+  const handleSubmit = async () => {
+   try {
+    const formData = new FormData();
+
+    formData.append("TargetName", form.TargetName);
+    formData.append("TargetAmount", form.TargetAmount);
+    formData.append("AmountToAdd", form.AmountToAdd);
+    formData.append("FundFrequency", form.FundFrequency);
+    formData.append("AutoSave", form.AutoSave);
+    
+    if (form.GoalUrl) {
+      formData.append("GoalUrl", {
+        uri: form.GoalUrl.uri,
+        type: form.GoalUrl.type, 
+        name: form.GoalUrl.fileName || "goal.jpg", // fallback name
+      });
+    }
+    console.log("Submitting formData...", formData);
+    const result = await setGoal(formData).unwrap();
+
+    console.log("Set Goal successful", result);
+    Alert.alert(result.message || "Goal set successfully");
+
+    // Reset form after success
+    setForm({
+      TargetName: "",
+      TargetAmount: "",
+      AmountToAdd: "",
+      FundFrequency: "",
+      AutoSave: false,
+    });
+    navigation.navigate('Dashboard', { id: userId}); // Navigate to Dashboard after setting goal
+
+  } catch (error) {
+    console.error("Error setting goal", error);
+    Alert.alert("Failed to set goal", error?.data?.message || "An error occurred");
+  }
+};
 
   return (
     <Layout>

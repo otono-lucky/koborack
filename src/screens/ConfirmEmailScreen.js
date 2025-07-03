@@ -13,6 +13,7 @@ import {
   Keyboard,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import withThemeHeader from '../hoc/WithThemeHeader';
@@ -23,8 +24,8 @@ const ConfirmEmailScreen = ({ navigation }) => {
   const [code, setCode] = useState('');
   const userId = navigation.getParam('id');
 
-  const [ confirmEmail, {isLoading} ] = useConfirmEmailMutation();
-  const [ resendVerificationEmail, {isSuccess} ] = useResendVerificationEmailMutation();
+  const [ confirmEmail, { isLoading } ] = useConfirmEmailMutation();
+  const [ resendVerificationEmail, { isLoading: isResending } ] = useResendVerificationEmailMutation();
 
   const handleEmailConfirmation = async () => {
     if (!code) {
@@ -90,12 +91,13 @@ const ConfirmEmailScreen = ({ navigation }) => {
             />
             <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]}
               onPress={() => handleEmailConfirmation()}
+              disabled={isLoading}
             >
-            <Text style={styles.buttonText}>{!isLoading ? "Confirm" : "Loading..."}</Text>
+            <Text style={styles.buttonText}>{!isLoading ? "Confirm" : <ActivityIndicator size="small" color="#fff" style={{marginVertical: 2}} />}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.resendLink} onPress={() => handleResendEmailConfirmation()}>
-              <Text style={[styles.resendText, { color: theme.primary }]}>Resend email</Text>
+            <TouchableOpacity style={styles.resendLink} onPress={() => handleResendEmailConfirmation()} disabled={isResending}>
+             {isResending ? <ActivityIndicator size="small" color="#007bff" style={{marginVertical: 2}} />  : <Text style={[styles.resendText, { color: theme.primary }]}>Resend email</Text>}
             </TouchableOpacity>
           </ScrollView>
         </TouchableWithoutFeedback>

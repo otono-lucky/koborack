@@ -13,12 +13,13 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import withThemeHeader from '../hoc/WithThemeHeader';
 import { useLoginMutation } from '../api/authApi';
-import { decodeToken, saveToken } from '../utils/token';
+import { decodeUserToken, saveToken } from '../utils/token';
 
 const LoginScreen = ({ navigation }) => {
   const { theme } = useTheme();
@@ -47,12 +48,12 @@ const LoginScreen = ({ navigation }) => {
       await saveToken(token);
       console.log('Token saved successfully', token);
 
-      const userInfo = decodeToken(token);
+      const userInfo = decodeUserToken(token);
       
       if (!userInfo) {
         Alert.alert('Login failed', 'Invalid user information received.');
       }
-      const userId = userInfo["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"]
+      const userId = userInfo.userId
       
       if (!userId) {
         Alert.alert('Login failed', 'User ID not found in token.');
@@ -122,8 +123,8 @@ const LoginScreen = ({ navigation }) => {
               <Text style={[styles.forgotPasswordText, { color: theme.primary }]}>Forgot password?</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={() => handleLogin()}>
-              <Text style={styles.buttonText}>{!isLoading ? "Log In" : "loading..."}</Text>
+            <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={() => handleLogin()} disabled={isLoading}>
+              <Text style={styles.buttonText}>{isLoading ? <ActivityIndicator size="small" color="#fff" style={{marginVertical: 2}} /> : "Log In"} </Text>
             </TouchableOpacity>
 
             <View style={styles.footer}>
