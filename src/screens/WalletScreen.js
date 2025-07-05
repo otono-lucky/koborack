@@ -44,6 +44,7 @@ const WalletScreen = ({navigation}) => {
     refetchOnMountOrArgChange: true,
     skip: !userId,
   });
+  const walletInfo = wallet?.result 
   console.log('Wallet information', wallet)
 
   // Fetch user transactions
@@ -73,9 +74,9 @@ const WalletScreen = ({navigation}) => {
         <View style={[styles.walletCard, { backgroundColor: theme.card }]}>
           <Text style={[styles.walletLabel, { color: theme.text }]}>Current Balance</Text>
           {isError ? <Text style={[styles.walletAmount, { color: theme.primary }]}>N/A</Text>
-          : <Text style={[styles.walletAmount, { color: theme.primary }]}>{formatCurrency(wallet?.result?.balance)}</Text>}
+          : <Text style={[styles.walletAmount, { color: theme.primary }]}>{formatCurrency(walletInfo?.balance)}</Text>}
           <View style={styles.walletActions}>
-            <TouchableOpacity style={[styles.walletBtn, { backgroundColor: theme.primary }]}>
+            <TouchableOpacity style={[styles.walletBtn, { backgroundColor: theme.primary }]} onPress={() => navigation.navigate('FundWallet', {walletNumber: walletInfo?.walletNumber})}>
               <FontAwesome5 name="plus" size={14} color="#fff" />
               <Text style={styles.walletBtnText}>Add Money</Text>
             </TouchableOpacity>

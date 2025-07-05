@@ -44,17 +44,16 @@ const useSessionRedirect = async (navigation) => {
           console.log("User information not found in token")
           return;
         }
-        
         const { isExpired, emailConfirmed, userId, name } = user;
 
-        if (isExpired) {                
-          console.log("Token expired or invalid");
-          Alert.alert("Session expired", "Please log in again.");
-          navigation.navigate('Login');
-        } else if (!emailConfirmed) {                       
+        if (!emailConfirmed) {                       
           console.log("Email not confirmed");
           Alert.alert("Email not confirmed", "Please click on resend email to receive your verification otp.");
           navigation.navigate('ConfirmEmail', { id: userId });
+        } else if (isExpired) {                
+          console.log("Token expired or invalid");
+          Alert.alert("Session expired", "Please log in again.");
+          navigation.navigate('Login');
         } else {
           navigation.navigate('Dashboard', { id: userId });
         }

@@ -12,6 +12,12 @@ export const walletApi = createApi({
                 body: data
             })
         }),
+        verifyFunding: builder.mutation({
+            query: (referenceCode) => ({
+                url: `/Wallet/paystack/verify/${referenceCode}`,
+                method: 'POST'
+            })
+        }),
         getWallets: builder.query({
             query: () => ({
                 url: '/Wallet/getAllWallets',
@@ -45,5 +51,6 @@ export const {
     useGetWalletsQuery,
     useGetWalletQuery,
     useGetWalletByNumberQuery,
-    useGetBalanceQuery
+    useGetBalanceQuery,
+    useVerifyFundingMutation
 } = walletApi

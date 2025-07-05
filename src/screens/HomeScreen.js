@@ -18,13 +18,15 @@ const HomeScreen = ({ navigation }) => {
   }, []);
 
   if (isCheckingSession) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#007bff" />
-      </View>
-    );
-  }
-
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#16a34a' }}>
+      <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#fff', marginBottom: 12 }}>
+        Koborack
+      </Text>
+      <ActivityIndicator size="large" color="#fff" />
+    </View>
+  );
+}
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
