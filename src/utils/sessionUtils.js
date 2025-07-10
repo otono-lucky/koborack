@@ -46,7 +46,7 @@ const useSessionRedirect = async (navigation) => {
         }
         const { isExpired, emailConfirmed, userId, name } = user;
 
-        if (!emailConfirmed) {                       
+        if (emailConfirmed) {                       
           console.log("Email not confirmed");
           Alert.alert("Email not confirmed", "Please click on resend email to receive your verification otp.");
           navigation.navigate('ConfirmEmail', { id: userId });

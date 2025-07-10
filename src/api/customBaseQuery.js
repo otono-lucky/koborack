@@ -8,7 +8,7 @@ const custommBaseQuery = async (args, api, extraOptions) => {
   const tokent = await getToken();
   
   const baseQuery = fetchBaseQuery({
-    baseUrl: process.env.NODE_ENV === 'development' ? DEV_BASE_URL : BASE_URL,
+    baseUrl: process.env.NODE_ENV !== 'development' ? DEV_BASE_URL : BASE_URL,
     prepareHeaders: (headers) => {
       if (tokent) {
         headers.set('Authorization', `Bearer ${tokent}`);
