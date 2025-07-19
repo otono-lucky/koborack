@@ -1,23 +1,17 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getToken } from "../utils/token";
+import custommBaseQuery from "./customBaseQuery";
+
+// const baseUrl = process.env.NODE_ENV === 'development' ? DEV_BASE_URL : BASE_URL
 
 export const goalSavingApi = createApi({
     reducerPath: 'savingApi',
-    baseQuery: fetchBaseQuery({ 
-        baseUrl: 'https://koborack.onrender.com/api/Savings', 
-        // prepareHeaders:  (headers) => () => {
-        //     const token = getToken();
-        //     if (token) {
-        //         headers.set('Authorization', `Bearer ${token}`);
-        //     }
-        //     return headers;
-        // }
-    }),
+    baseQuery: custommBaseQuery,
     tagTypes: ["Goals"],
     endpoints: (builder) => ({
         setGoal: builder.mutation({
             query: (formData) => ({
-                url: '/SetGoal',
+                url: '/Savings/SetGoal',
                 method: 'POST',
                 body: formData
             }),
@@ -25,20 +19,20 @@ export const goalSavingApi = createApi({
         }),
         getGoals: builder.query({
             query: (userId) => ({
-                url: `/listAllGoals/${userId}`,
+                url: `/Savings/listAllGoals/${userId}`,
                 method: 'GET',
             }),
             providesTags: [{type: "Goals"}],
         }),
         getGoal: builder.query({
             query: (SavingsId) => ({
-                url: `/getPersonalSavings/${SavingsId}`,
+                url: `/Savings/getPersonalSavings/${SavingsId}`,
                 method: 'GET',
             })
         }),
         updateGoal: builder.mutation({
             query: (formData, goalId) => ({
-                url: `/${goalId}`,
+                url: `/Savings/${goalId}`,
                 method: 'PUT',
                 body: formData
             }),
@@ -46,20 +40,20 @@ export const goalSavingApi = createApi({
         }),
         delteGoal: builder.mutation({
             query: (goalId) => ({
-                url: `/${goalId}`,
+                url: `/Savings/${goalId}`,
                 method: 'DELETE'
             }),
             invalidatesTags: [{type: "Goals"}],
         }),
         getTotalGoalAmount: builder.query({
             query: (userId) => ({
-                url: `/totalGoalAmount/${userId}`,
+                url: `/Savings/totalGoalAmount/${userId}`,
                 method: 'GET',
             })
         }),
         getGoalFundCount: builder.query({
             query: () => ({
-                url: `/totalPersonalFundCount`,
+                url: `/Savings/totalPersonalFundCount`,
                 method: 'GET',
             })
         }),

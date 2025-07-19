@@ -1,10 +1,32 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 
 const HomeScreen = ({ navigation }) => {
   const { theme } = useTheme();
+
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
+
+  useEffect(() => {
+    const checkSessionWithDelay = async () => {
+      await useSessionRedirect(navigation);
+      setIsCheckingSession(false);
+    };
+
+    checkSessionWithDelay();
+  }, []);
+
+  if (isCheckingSession) {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#16a34a' }}>
+      <Text style={{ fontSize: 28, fontWeight: 'bold', color: '#fff', marginBottom: 12 }}>
+        Koborack
+      </Text>
+      <ActivityIndicator size="large" color="#fff" />
+    </View>
+  );
+}
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
@@ -51,6 +73,7 @@ const HomeScreen = ({ navigation }) => {
 };
 
 import withThemeHeader from '../hoc/WithThemeHeader';
+import useSessionRedirect from '../utils/sessionUtils';
 export default withThemeHeader(HomeScreen, 'Home');
 
 const features = [

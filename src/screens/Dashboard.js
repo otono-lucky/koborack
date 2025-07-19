@@ -7,11 +7,12 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import Layout from "../hoc/Layout";
 import { useGetUserQuery } from "../api/userApi";
-import { validateSession } from "../utils/sessionUtils";
+import useSessionRedirect, { validateSession } from "../utils/sessionUtils";
 import { useGetGoalsQuery, useGetTotalGoalAmountQuery } from "../api/goalSavingsApi";
 import { useGetActiveGroupsQuery } from "../api/groupSavingApi";
 import { formatCurrency } from "../utils/format";
@@ -41,7 +42,7 @@ const openAddMoneyModal = (goalName) => {
   console.log('User ID from navigation:', initialUserId);
 
   // Query for user data
-  const { data: user, isLoading: userLoading } = useGetUserQuery(userId, {
+  const { data: user, isLoading: userLoading, isError: userError } = useGetUserQuery(userId, {
     skip: !userId, 
   });
   console.log("User Details",user)
@@ -59,7 +60,7 @@ const openAddMoneyModal = (goalName) => {
   console.log('Active Groups:', groups);
 
   // Query for user total goal amount saved
-  const { data: totalGoalAmountSaved } = useGetTotalGoalAmountQuery(userId, {
+  const { data: totalGoalAmountSaved, isLoading: goalAmountLoading, isError: goalAmountError } = useGetTotalGoalAmountQuery(userId, {
     skip: !userId,
   });
   const totalAmountSaved = totalGoalAmountSaved?.result || 0;
@@ -68,24 +69,25 @@ const openAddMoneyModal = (goalName) => {
   useEffect(() => {
     // removeToken();
   const checkSession = async () => {
-  await validateSession(() => navigation.navigate('Login'))
-    .then(session => {
-      if (session) {
-        setUserId(session.userId);
-        console.log("Session validated, user ID:", session.userId);
-      }
-    });
+  useSessionRedirect(navigation);
   }
-  checkSession();
 }, []);
 
   return (
     <Layout title="Dashboard" navigation={navigation} onSavePress={() => setSaveModalVisible(true)}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Welcome Banner */}
+       
+         
         <View style={styles.banner}>
-          <Text style={styles.bannerTitle}>Hello, {user?.firstName || "User"}</Text>
-          <Text style={styles.bannerSubtitle}>You've saved {formatCurrency(totalAmountSaved)} this month! 🎉</Text>
+          {userLoading ? <ActivityIndicator size="small" color="#fff" style={{marginRight: "auto", marginBottom: 20}} /> :
+          userError ? <Text style={[styles.bannerSubtitle, {marginVertical: 10}]}>An error occured, please try again.</Text>:
+          <>
+            <Text style={styles.bannerTitle}>Hello, {user?.firstName || "User"}</Text>
+            {goalAmountLoading ? <ActivityIndicator size="small" color="#fff" style={{marginRight: "auto", marginVertical: 10}} /> :
+            goalAmountError ? <Text style={[styles.bannerSubtitle, {fontSize: 8}]}>Error while retrieving this month total savings.</Text> :
+             <Text style={styles.bannerSubtitle}>You've saved {formatCurrency(totalAmountSaved)} this month! 🎉</Text>}
+          </> }
         </View>
 
         {/* Quick Actions */}
@@ -115,6 +117,7 @@ const openAddMoneyModal = (goalName) => {
           //   { title: "Electricity", desc: "Monthly electricity bill", icon: "bolt", saved: "₦3,200", target: "₦5,000", progress: 64, color: "#2563eb" },
           //   { title: "Rent Fund", desc: "Yearly rent savings", icon: "home", saved: "₦45,000", target: "₦300,000", progress: 15, color: "#7c3aed" },
           // ]
+          goalsLoading ? <ActivityIndicator size="small" color="#007bff" style={{marginVertical: 20}} /> :
           goalsError ? <Text style={{ textAlign: 'center', marginVertical: 40 }}>An error occured, please try again later!</Text>
           : goals?.length === 0 ? 
             <Text style={{ textAlign: 'center', marginVertical: 40 }}>No goals set yet. Start saving today!</Text>
@@ -180,6 +183,7 @@ const openAddMoneyModal = (goalName) => {
         </View>
         
        { 
+          activeGroupsLoading ? <ActivityIndicator size="small" color="#007bff" style={{marginVertical: 20}} /> :
          activeGroupsError ? <Text style={{ textAlign: 'center', marginVertical: 40 }}>An error occured, please try again later!</Text>
        :   activeGroups.length === 0 ? 
         <Text style={{ textAlign: 'center', marginTop: 40 }}>No groups available. Start by creating a group!</Text>

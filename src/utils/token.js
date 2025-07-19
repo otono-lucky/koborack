@@ -24,6 +24,34 @@ export const decodeToken = (token) => {
       }
 }
 
+export const decodeUserToken = (token) => {
+  try {
+    const decoded = jwtDecode(token);
+    console.log('Decoded JWT payload:', decoded);
+
+    const expiresAt = decoded.exp * 1000;
+    const now = Date.now();
+
+    return {
+      userId: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"],
+      name: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"],
+      email: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] || decoded.email,
+      role: decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"],
+      phoneNumber: decoded.phoneNumber,
+      emailConfirmed: decoded.emailConfirmed === 'True',
+      isExpired: expiresAt < now, // Convert to milliseconds for comparison
+      expiresAt, // Still helpful for comparing in ms
+      jti: decoded.jti,
+      exp: decoded.exp, // original UNIX timestamp
+      iss: decoded.iss,
+      raw: decoded, // optional: keep full payload for fallback or logging
+    };
+  } catch (error) {
+    console.error('Error decoding JWT:', error);
+    return null;
+  }
+};
+
 // import * as LocalAuthentication from 'expo-local-authentication';
 
 // async function authenticateUser() {

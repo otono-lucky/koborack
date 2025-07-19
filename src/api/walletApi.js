@@ -1,38 +1,45 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import custommBaseQuery from "./customBaseQuery";
 
 export const walletApi = createApi({
     reducerPath: 'walleApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'https://koborack.onrender.com/api/Wallet' }),
+    baseQuery: custommBaseQuery,
     endpoints: (builder) => ({
         fundWallet: builder.mutation({
             query: (data) => ({
-                url: '/FundWallet',
+                url: '/Wallet/FundWallet',
                 method: 'POST',
                 body: data
             })
         }),
+        verifyFunding: builder.mutation({
+            query: (referenceCode) => ({
+                url: `/Wallet/paystack/verify/${referenceCode}`,
+                method: 'POST'
+            })
+        }),
         getWallets: builder.query({
             query: () => ({
-                url: '/getAllWallets',
+                url: '/Wallet/getAllWallets',
                 method: 'GET',
             })
         }),
         getWallet: builder.query({
             query: (walletId) => ({
-                url: `/${walletId}`,
+                url: `/Wallet/${walletId}`,
                 method: 'GET',
             })
         }),
         getWalletByNumber: builder.query({
             query: (number) => ({
-                url: `/getWalletByNumber`,
+                url: `/Wallet/getWalletByNumber`,
                 method: 'GET',
                 params: number
             })
         }),
         getBalance: builder.query({
             query: () => ({
-                url: `/totalbalance`,
+                url: `/Wallet/totalbalance`,
                 method: 'GET',
             })
         }),
@@ -44,5 +51,6 @@ export const {
     useGetWalletsQuery,
     useGetWalletQuery,
     useGetWalletByNumberQuery,
-    useGetBalanceQuery
+    useGetBalanceQuery,
+    useVerifyFundingMutation
 } = walletApi

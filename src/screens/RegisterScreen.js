@@ -13,6 +13,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
@@ -134,7 +135,8 @@ const RegisterScreen = ({ navigation }) => {
             })}
 
             <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={() => handleSignUp(form)}>
-              <Text style={styles.buttonText}>{!isLoading ? "Sign Up" : "Loading..."}</Text>
+              <Text style={styles.buttonText}>{!isLoading ? "Sign Up" : <ActivityIndicator size="small" color="#fff" style={{marginVertical: 20}} />
+              }</Text>
             </TouchableOpacity>
 
             <View style={styles.footer}>

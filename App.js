@@ -13,6 +13,9 @@ import { store } from "./src/api/store";
 import WalletScreen from './src/screens/WalletScreen';
 import SetGoalScreen from './src/screens/SetGoalScreen';
 import SaveScreen from './src/screens/SaveScreen';
+import FundWalletScreen from "./src/screens/FundWalletScreen";
+import PaystackWebviewScreen from "./src/screens/PaystackWebviewScreen";
+import FundSuccessScreen from "./src/screens/FundSuccessScreen";
 
 const navigator = createStackNavigator(
   {
@@ -25,6 +28,9 @@ const navigator = createStackNavigator(
     Wallet: WalletScreen,
     SetGoal: SetGoalScreen,
     Save: SaveScreen,
+    FundWallet: FundWalletScreen,
+    PaystackWebview: PaystackWebviewScreen,
+    FundSuccess: FundSuccessScreen
   },
   {
     initialRouteName: 'Home',
