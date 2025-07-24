@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
@@ -48,7 +49,7 @@ const WalletScreen = ({navigation}) => {
   console.log('Wallet information', wallet)
 
   // Fetch user transactions
-  const { data: transactions, isError: transactionError } = useGetUserTransactionQuery(userId, {
+  const { data: transactions, isError: transactionError, isLoading: isTransactionLoading } = useGetUserTransactionQuery(userId, {
     skip: !userId 
   })
   const recentTransactions = transactions?.data || [];
@@ -73,14 +74,15 @@ const WalletScreen = ({navigation}) => {
         {/* Wallet Balance */}
         <View style={[styles.walletCard, { backgroundColor: theme.card }]}>
           <Text style={[styles.walletLabel, { color: theme.text }]}>Current Balance</Text>
-          {isError ? <Text style={[styles.walletAmount, { color: theme.primary }]}>N/A</Text>
-          : <Text style={[styles.walletAmount, { color: theme.primary }]}>{formatCurrency(walletInfo?.balance)}</Text>}
+          { isLoading ? <ActivityIndicator size="small" color="#007bff" style={{marginLeft: "20px", marginVertical: 20}} /> :
+            isError ? <Text style={[styles.walletAmount, { color: theme.primary }]}>Failed to load wallet balance</Text>
+          : <Text style={[styles.walletAmount, { color: theme.primary }]}>{formatCurrency(walletInfo?.availableBalance)}</Text>}
           <View style={styles.walletActions}>
             <TouchableOpacity style={[styles.walletBtn, { backgroundColor: theme.primary }]} onPress={() => navigation.navigate('FundWallet', {walletNumber: walletInfo?.walletNumber})}>
               <FontAwesome5 name="plus" size={14} color="#fff" />
               <Text style={styles.walletBtnText}>Add Money</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.walletBtn, { backgroundColor: "#ef4444" }]}>
+            <TouchableOpacity style={[styles.walletBtn, { backgroundColor: "#842626ff" }]}>
               <FontAwesome5 name="minus" size={14} color="#fff" />
               <Text style={styles.walletBtnText}>Withdraw</Text>
             </TouchableOpacity>
@@ -106,20 +108,21 @@ const WalletScreen = ({navigation}) => {
         <Text style={[styles.sectionTitle, { color: theme.text }]}>Recent Transactions</Text>
         <View style={styles.transactionList}>
 
-          {transactionError ? (
+          { isTransactionLoading ? <ActivityIndicator size="small" color="#007bff" style={{marginHorizontal: "auto", marginVertical: 20}} /> 
+        : transactionError ? (
             <Text style={{ textAlign: "center",  marginTop: 80  }}>Failed to load transactions</Text> ) :
           recentTransactions.length === 0 ? (
             <Text style={{ textAlign: "center", marginTop: 80 }}>No recent transactions</Text>) :            
           recentTransactions.map(tx => {
             const { icon, color } = getTransactionStyle(tx.transactionType);
 
-            return ( <View key={tx.id} style={[styles.transactionItem, { backgroundColor: theme.card }]}>
+            return ( <View key={tx.reference} style={[styles.transactionItem, { backgroundColor: theme.card }]}>
               <FontAwesome5 name={icon} size={16} color={color} style={{ marginRight: 12 }} />
               <View style={{ flex: 1 }}>
                 <Text style={[styles.transactionType, { color: theme.text }]}>{tx.transactionType}</Text>
                 <Text style={styles.transactionDate}>{tx.createdAt}</Text>
               </View>
-              <Text style={[styles.transactionAmount, { color: color }]}>{tx.amount}</Text>
+              <Text style={[styles.transactionAmount, { color: color }]}>{formatCurrency(tx.amount)}</Text>
             </View> )
         })}
         </View>

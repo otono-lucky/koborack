@@ -81,7 +81,7 @@ const openAddMoneyModal = (goalName) => {
          
         <View style={styles.banner}>
           {userLoading ? <ActivityIndicator size="small" color="#fff" style={{marginRight: "auto", marginBottom: 20}} /> :
-          userError ? <Text style={[styles.bannerSubtitle, {marginVertical: 10}]}>An error occured, please try again.</Text>:
+          userError ? <Text style={[styles.bannerSubtitle, {marginVertical: 10}]}>An error occured, please try again.</Text> :
           <>
             <Text style={styles.bannerTitle}>Hello, {user?.firstName || "User"}</Text>
             {goalAmountLoading ? <ActivityIndicator size="small" color="#fff" style={{marginRight: "auto", marginVertical: 10}} /> :
