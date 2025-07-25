@@ -66,12 +66,12 @@ const openAddMoneyModal = (goalName) => {
   const totalAmountSaved = totalGoalAmountSaved?.result || 0;
   console.log('TotalAmountSaved',totalGoalAmountSaved)
 
-  useEffect(() => {
-    // removeToken();
-  const checkSession = async () => {
-  useSessionRedirect(navigation);
-  }
-}, []);
+//   useEffect(() => {
+//     // removeToken();
+//   const checkSession = async () => {
+//   useSessionRedirect(navigation);
+//   }
+// }, []);
 
   return (
     <Layout title="Dashboard" navigation={navigation} onSavePress={() => setSaveModalVisible(true)}>

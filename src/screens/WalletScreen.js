@@ -55,17 +55,17 @@ const WalletScreen = ({navigation}) => {
   const recentTransactions = transactions?.data || [];
   console.log('Transactions', transactions)
   
-  useEffect(() => {
-    const checkSession = async () => {
-    await validateSession(() => navigation.navigate('Login'))
-      .then(session => {
-        if (session) {
-          setUserId(session.userId);
-        }
-      });
-    }
-    checkSession();
-  }, []);
+  // useEffect(() => {
+  //   const checkSession = async () => {
+  //   await validateSession(() => navigation.navigate('Login'))
+  //     .then(session => {
+  //       if (session) {
+  //         setUserId(session.userId);
+  //       }
+  //     });
+  //   }
+  //   checkSession();
+  // }, []);
   
 
   return (

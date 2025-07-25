@@ -30,45 +30,46 @@ const LoginScreen = ({ navigation }) => {
   const [ login, { isLoading } ] = useLoginMutation();
 
   const handleLogin = async () => {
-    if (!email || !password){
-      Alert.alert("Please enter both your email and password")
-      return;
-    }
+    // if (!email || !password){
+    //   Alert.alert("Please enter both your email and password")
+    //   return;
+    // }
 
-    try {
-      const result = await login({email, password}).unwrap();
+    // try {
+    //   const result = await login({email, password}).unwrap();
       
-      const token = result.data
+    //   const token = result.data
       
-      if (!token) {
-        Alert.alert('Login failed', 'No token received. Please check your credentials.');
-        return;
-      }
+    //   if (!token) {
+    //     Alert.alert('Login failed', 'No token received. Please check your credentials.');
+    //     return;
+    //   }
       
-      await saveToken(token);
-      console.log('Token saved successfully', token);
+    //   await saveToken(token);
+    //   console.log('Token saved successfully', token);
 
-      const userInfo = decodeUserToken(token);
+    //   const userInfo = decodeUserToken(token);
       
-      if (!userInfo) {
-        Alert.alert('Login failed', 'Invalid user information received.');
-      }
-      const userId = userInfo.userId
+    //   if (!userInfo) {
+    //     Alert.alert('Login failed', 'Invalid user information received.');
+    //   }
+    //   const userId = userInfo.userId
       
-      if (!userId) {
-        Alert.alert('Login failed', 'User ID not found in token.');
-      }
+    //   if (!userId) {
+    //     Alert.alert('Login failed', 'User ID not found in token.');
+    //   }
 
-      console.log('Login successful', result)
-      console.log('User ID', userId)
-      Alert.alert('succeeded', result.message || 'Login successful')
+    //   console.log('Login successful', result)
+    //   console.log('User ID', userId)
+    //   Alert.alert('succeeded', result.message || 'Login successful')
     
-      navigation.navigate('Dashboard', { id: userId });
-
-    } catch (error) {
-      console.error('Login failed:', error)
-      Alert.alert('Login failed', error?.data?.message)
-    }
+    // navigation.navigate('Dashboard', { id: userId });
+    
+    // } catch (error) {
+      //   console.error('Login failed:', error)
+      //   Alert.alert('Login failed', error?.data?.message)
+      // }
+      navigation.navigate('Dashboard');
   }
 
   return (
