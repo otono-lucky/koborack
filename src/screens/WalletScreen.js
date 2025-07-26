@@ -10,9 +10,7 @@ import {
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 import Layout from "../hoc/Layout";
-import {
-  useGetWalletQuery,
-} from "../api/walletApi";
+import { useFundWalletMutation, useGetBalanceQuery, useGetWalletQuery } from "../api/walletApi";
 import { validateSession } from "../utils/sessionUtils";
 import { formatCurrency } from "../utils/format";
 import { useGetUserTransactionQuery } from "../api/transactionAPi";
@@ -41,28 +39,30 @@ const WalletScreen = ({ navigation }) => {
   const recentTransactions = transactions?.data || [];
 
   const getTransactionStyle = (type) => {
-    switch (type.toLowerCase()) {
-      case "deposit":
-        return { icon: "arrow-down", color: "#22c55e" };
-      case "withdrawal":
-        return { icon: "arrow-up", color: "#ef4444" };
-      case "transfer":
-        return { icon: "exchange-alt", color: "#3b82f6" };
-      default:
-        return { icon: "question", color: "#6b7280" };
-    }
-  };
+  switch (type.toLowerCase()) {
+    case "deposit":
+      return { icon: "arrow-down", color: "#22c55e" };
+    case "withdrawal":
+      return { icon: "arrow-up", color: "#ef4444" };
+    case "transfer":
+      return { icon: "exchange-alt", color: "#3b82f6" };
+    default:
+      return { icon: "question", color: "#6b7280" }; // fallback icon and color
+  }
+};
 
-  useEffect(() => {
-    const checkSession = async () => {
-      await validateSession(() => navigation.navigate("Login")).then((session) => {
-        if (session) {
-          setUserId(session.userId);
-        }
-      });
-    };
-    checkSession();
-  }, []);
+  // useEffect(() => {
+  //   const checkSession = async () => {
+  //   await validateSession(() => navigation.navigate('Login'))
+  //     .then(session => {
+  //       if (session) {
+  //         setUserId(session.userId);
+  //       }
+  //     });
+  //   }
+  //   checkSession();
+  // }, []);
+  
 
   return (
     <Layout title="Wallet">
