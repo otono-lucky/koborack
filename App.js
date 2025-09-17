@@ -33,7 +33,7 @@ const navigator = createStackNavigator(
     FundSuccess: FundSuccessScreen
   },
   {
-    initialRouteName: 'Home',
+    initialRouteName: 'Dashboard',
     defaultNavigationOptions: {
       headerShown: false,
     },
